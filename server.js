@@ -89,6 +89,15 @@ app.get("/summary", function(req, res) {
     });
 });
 
+app.get("/", function(req, res) {
+    db.Article.find({}, function(err, data) {
+        let handlebarObject = {
+            articles: data
+        };
+        res.render("index", handlebarObject);
+    })
+})
+
 app.listen(PORT, function() {
     console.log("App running on port " + PORT + "!");
 });
