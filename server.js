@@ -1,7 +1,6 @@
 let cheerio = require("cheerio");
 let express = require("express");
 let axios = require("axios");
-let expHand = require("express-handlebars");
 let mongoose = require("mongoose");
 let logger = require("morgan");
 let db = require("./models");
@@ -13,11 +12,12 @@ mongoose.set("useCreateIndex", true);
 mongoose.connect(MONGODB_URI, {useNewUrlParser: true});
 let PORT = process.env.PORT || 3000;
 
-
 // Initialize Express
 let app = express();
 // Configure middleware
-
+let expHand = require("express-handlebars");
+app.engine("handlebars", expHand({ defaultLayout: "main" }));
+app.set("view engine", "handlebars")
 // Use morgan logger for logging requests
 app.use(logger("dev"));
 // Parse request body as JSON
