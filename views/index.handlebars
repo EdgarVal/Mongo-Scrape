@@ -1,3 +1,39 @@
-<h1>Tampa Bay Bucs News</h1>
+<div class="jumbotron jumbotron-fluid">
+  <div class="container text-center">
+    <h1 class="display-4"><b>Tampa Bay Buccaneers News</b></h1>
+    <hr class="my-4">
+    <p class="j-text"><b>All your up to date Buccaneers sports news w/ a Mongodb Scraper!</b></p>
+    <p class="j-text"><b>Click the scrape button to get new articles or click the saved button to get your saved articles</b></hp>
+    <hr class="my-4">
+    <button type="button" class="btn btn-primary" id="scrapeBtn">Scrape Articles</button>
+    <button type="button" class="btn btn-warning" id="savedBtn">Saved Articles</button>
+  </div>
+</div>
 
-<div id="articles"></div>
+<div class="container text-center">
+  <h3>Latest Team News</h3>
+    <hr class="my-4">
+  {{#each article}}
+    <div class="card">
+      <h3 class="card-header">{{this.title}}</h3>
+            {{#if summary}}
+            <p class="card-text"><b>{{this.summary}}</b></p>
+            {{else}}
+            <p class="card-text"><b>Click (Read More) to open article</b></p>
+            {{/if}}
+      <hr class="my-4">
+      <div class="row">
+        <div class="col-lg-8 card-block">
+          <a href="{{this.link}}" target="_blank" class="card-link">Read More</a>
+        </div>
+        <div class="col-lg-4 align-self-end">
+          {{#if saved}}
+          <button class="btn btn-secondary m-2 disabled">Article Saved</button>
+          {{else}}
+          <button class="btn btn-success m-2 btn-save" data-id="{{this._id}}">Save Article</button>
+          {{/if}}
+        </div>
+      </div>
+    </div>
+  {{/each}}
+</div>

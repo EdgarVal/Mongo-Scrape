@@ -1,50 +1,62 @@
-let cheerio = require("cheerio");
-let express = require("express");
-let axios = require("axios");
-let mongoose = require("mongoose");
-let logger = require("morgan");
-let db = require("./models");
+const cheerio = require("cheerio");
+const express = require("express");
+const axios = require("axios");
+const mongoose = require("mongoose");
+const logger = require("morgan");
+const db = require("./models");
+const bodyParser = require("body-parser");
 
 mongoose.Promise = global.Promise;
-let MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoScrape";
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoScrape";
 
 mongoose.set("useCreateIndex", true);
 mongoose.connect(MONGODB_URI, {useNewUrlParser: true});
-let PORT = process.env.PORT || 3000;
+
+const PORT = process.env.PORT || 3000;
 
 // Initialize Express
-let app = express();
+const app = express();
 // Configure middleware
-let expHand = require("express-handlebars");
+const expHand = require("express-handlebars");
 app.engine("handlebars", expHand({ defaultLayout: "main" }));
 app.set("view engine", "handlebars")
+
 // Use morgan logger for logging requests
 app.use(logger("dev"));
+
 // Parse request body as JSON
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
 // Make public a static folder
 app.use(express.static("public"));
 
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
+//Global variables-------------------------------------
+let artObject;
+
+//-----------------------------------------------------
 //Get route for scraping website
 app.get("/scrape", function(req, res) {
     axios.get("https://bleacherreport.com/tampa-bay-buccaneers").then(function(response) {
-        let $ = cheerio.load(response.data);
+        const $ = cheerio.load(response.data);
         // console.log(response.data);
-        $(".articleSummary").each(function(i, element) {
+        $(".articleContent").each(function(i, element) {
             let result = {};
             let summary = $(element).find("p").text();
             if (!summary) {
-                console.log("no sum" + result);
+                // console.log("no sum" + result);
                 result.summary = null;            
             } else {
                 result.summary = summary;
             }
             result.title = $(element).find("h3").text();
-            result.link = $(element).find("a").attr("href");
-            console.log("this--" + result.title);
-            console.log("that--" + result.summary);
-            console.log("here--" + result.link);
+            result.link = $(element).find(".articleTitle").attr("href");
+            // console.log("this--" + result.title);
+            // console.log("that--" + result.summary);
+            // console.log("here--" + result.link);
             db.Article.create(result).then(function(err, dbArticle) { 
                 if(err) {
                 console.log(err);
@@ -53,49 +65,64 @@ app.get("/scrape", function(req, res) {
             }  
             });
         });
-        res.send("Scrape Complete");
+        res.redirect("/articles");
+        // res.send("Scrape Complete");
     });
-});
+});//--------working
 
-app.get("/articles", function (req, res) {
+app.get("/articles", function (req, res) { //shows all articles from scrape
+    db.Article.find({}).then(function(dbArticle) {
+        artObject = {article: dbArticle};
+        res.render("index", artObject);
+        // res.json(dbArticle);
+    }).catch(function(err) {
+        res.json(err);
+    });
+});//--------working
+
+app.get("/saved", function (req, res) { //shows all the users saved articles
     db.Article.find({}).then(function(dbArticle) {
         res.json(dbArticle);
     }).catch(function(err) {
         res.json(err);
     });
-});//working
-
-app.get("/saved", function (req, res) {
-    db.Article.find({}).then(function(dbArticle) {
-        res.json(dbArticle);
-    }).catch(function(err) {
-        res.json(err);
-    });
 });
 
-app.get("/null", function(req, res) {
+app.get("/null", function(req, res) { //shows all articles with no summary
     db.Article.find({summary:null}).then(function(dbArticle) {
         res.json(dbArticle);
     }).catch(function(err) {
         res.json(err);
     });
-});
+});//--------working
 
-app.get("/summary", function(req, res) {
+app.get("/summary", function(req, res) { //shows all articles with a summary
     db.Article.find({summary:{$ne: null}}).then(function(dbArticle) {
         res.json(dbArticle);
     }).catch(function(err) {
         res.json(err);
     });
-});
+});//--------working
 
-app.get("/", function(req, res) {
-    db.Article.find({}, function(err, data) {
-        let handlebarObject = {
-            articles: data
-        };
-        res.render("index", handlebarObject);
+app.get("/", function(req, res) { //route for homepage
+
+    db.Article.find({}).then((dbArticle) => {
+        if(dbArticle.length == 0) {
+            res.render("index");
+        } else {
+            res.redirect("/articles");
+        }
+    }).catch((err) => {
+        res.json(err);
     })
+})
+
+app.post("/notes/save/:id", function(req, res) {
+    let newNote = new newNote({
+        body: req.body.text,
+        title: req.params.title
+    });
+
 })
 
 app.listen(PORT, function() {
