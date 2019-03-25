@@ -10,3 +10,17 @@
 h1, .j-text {
     text-shadow: 2px 2px 5px black;
 }
+
+.link {
+    color: white;
+}
+
+a:link, a:visited {
+    text-decoration: none;
+    color: white;
+}
+
+a:hover, a:active {
+    text-decoration: none;
+    color: white;
+}

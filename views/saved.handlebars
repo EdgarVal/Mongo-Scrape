@@ -1,0 +1,34 @@
+<div class="jumbotron jumbotron-fluid">
+  <div class="container text-center">
+    <h1 class="display-4" id="title"><a href="/" class="text-danger"><b>Tampa Bay Buccaneers News</b></a></h1>
+    <hr class="my-4">
+    <p class="j-text"><b>All your saved articles</b></p>
+    <hr class="my-4">
+    <button type="button" class="btn btn-danger" id="clearBtn">Clear Articles</button>
+  </div>
+</div>
+
+<div class="container text-center">
+    <h3>Team News</h3>
+    <hr class="my-4">
+    {{#each article}}
+        <div class="card">
+            <h3 class="card-header">{{this.title}}</h3>
+            {{#if summary}}
+            <p class="card-text"><b>{{this.summary}}</b></p>
+            {{else}}
+            <p class="card-text"><b>Click (Read More) to open article</b></p>
+            {{/if}}
+        <hr class="my-4">
+            <div class="row">
+                <div class="col-lg-8 card-block">
+                    <button class="btn btn-secondary m-2"><a href="{{this.link}}" target="_blank" class="card-link">Read More</a></button>
+                </div>
+                <div class="col-lg-4 align-self-end text-right">
+                    <button class="btn btn-danger m-2" id="remove" data-id="{{this._id}}">Remove</button>
+                    <button class="btn btn-success m-2" id="viewNotes" data-id="{{this_.id}}">View Notes</button>
+                </div>
+            </div>
+        </div>
+    {{/each}}
+</div>

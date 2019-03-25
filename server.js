@@ -42,7 +42,7 @@ let artObject;
 app.get("/scrape", function(req, res) {
     axios.get("https://bleacherreport.com/tampa-bay-buccaneers").then(function(response) {
         const $ = cheerio.load(response.data);
-        // console.log(response.data);
+         console.log(response.data);
         $(".articleContent").each(function(i, element) {
             let result = {};
             let summary = $(element).find("p").text();
@@ -71,7 +71,7 @@ app.get("/scrape", function(req, res) {
 });//--------working
 
 app.get("/articles", function (req, res) { //shows all articles from scrape
-    db.Article.find({}).then(function(dbArticle) {
+    db.Article.find({}).sort({timestamp: 1}).then(function(dbArticle) {
         artObject = {article: dbArticle};
         res.render("index", artObject);
         // res.json(dbArticle);
@@ -81,8 +81,10 @@ app.get("/articles", function (req, res) { //shows all articles from scrape
 });//--------working
 
 app.get("/saved", function (req, res) { //shows all the users saved articles
-    db.Article.find({}).then(function(dbArticle) {
-        res.json(dbArticle);
+    db.Article.find({saved: true}).then(function(dbArticle) {
+        artObject = {article: dbArticle};
+        res.render("saved", artObject);
+        // res.json(dbArticle);
     }).catch(function(err) {
         res.json(err);
     });
@@ -105,8 +107,7 @@ app.get("/summary", function(req, res) { //shows all articles with a summary
 });//--------working
 
 app.get("/", function(req, res) { //route for homepage
-
-    db.Article.find({}).then((dbArticle) => {
+    db.Article.find({}).sort({timestamp: 1}).then((dbArticle) => {
         if(dbArticle.length == 0) {
             res.render("index");
         } else {
@@ -124,6 +125,18 @@ app.post("/notes/save/:id", function(req, res) {
     });
 
 })
+
+//save an article 
+app.put("/article/:id", (req, res) => {
+    let id = req.params.id;
+    console.log("this is " + id);
+    db.Article.findByIdAndUpdate(id, {$set: {saved: true}}).then((dbArticle) => {
+        console.log(" article saved");
+        res.json(dbArticle);
+    }).catch((err) => {
+        res.json(err);
+    });
+});
 
 app.listen(PORT, function() {
     console.log("App running on port " + PORT + "!");

@@ -1,12 +1,13 @@
 <div class="jumbotron jumbotron-fluid">
   <div class="container text-center">
-    <h1 class="display-4"><b>Tampa Bay Buccaneers News</b></h1>
+    <h1 class="display-4" id="title"><a href="/" class="text-danger"><b>Tampa Bay Buccaneers News</b></a></h1>
     <hr class="my-4">
     <p class="j-text"><b>All your up to date Buccaneers sports news w/ a Mongodb Scraper!</b></p>
-    <p class="j-text"><b>Click the scrape button to get new articles or click the saved button to get your saved articles</b></hp>
+    <p class="j-text"><b>Click the scrape button to get new articles or click the saved button to get your saved articles</b></p>
     <hr class="my-4">
     <button type="button" class="btn btn-primary" id="scrapeBtn">Scrape Articles</button>
-    <button type="button" class="btn btn-warning" id="savedBtn">Saved Articles</button>
+    <a href="/saved" class="btn btn-warning link" id="savedArtBtn" role="button">Saved Articles</a>
+    <button type="button" class="btn btn-danger" id="clearBtn">Clear Articles</button>
   </div>
 </div>
 
@@ -23,14 +24,14 @@
             {{/if}}
       <hr class="my-4">
       <div class="row">
-        <div class="col-lg-8 card-block">
-          <a href="{{this.link}}" target="_blank" class="card-link">Read More</a>
+        <div class="col-lg-8 d-flex justify-content-around">
+          <a href="{{this.link}}" target="_blank" class="btn btn-secondary m-2 link" role="button">Read More</a>
         </div>
-        <div class="col-lg-4 align-self-end">
+        <div class="col-lg-2">
           {{#if saved}}
           <button class="btn btn-secondary m-2 disabled">Article Saved</button>
           {{else}}
-          <button class="btn btn-success m-2 btn-save" data-id="{{this._id}}">Save Article</button>
+          <button class="btn btn-success m-2 btn-save" id="saveArt" data-id="{{this._id}}">Save Article</button>
           {{/if}}
         </div>
       </div>
